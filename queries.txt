@@ -1,0 +1,148 @@
+###TASK 1 
+create database LibraryManagement;
+use LibraryManagement;
+
+create table authors (author_id int primary key, author_name varchar(55));
+create table genres (genre_id int primary key auto_increment, genre_name varchar (55));
+create table books (book_id int primary key auto_increment, title varchar (55), publication_year year, author_id int, genre_id int,  FOREIGN KEY (author_id) REFERENCES authors(author_id), FOREIGN KEY (genre_id) REFERENCES genres (genre_id));
+create table users (user_id int primary key auto_increment, username varchar (55), email varchar(55));
+create table borrowed_books (borrow_id int primary key auto_increment, book_id int, user_id int, borrow_date date, return_date date, foreign key (book_id) REFERENCES books(book_id), foreign key (user_id) references users (user_id));
+
+
+###TASK 2
+
+insert into users (user_id, username, email)
+values (1, "Adam", "adam@g.com"), (2, "Din", "dinm@g.com"), (3, "Sem", "sem@g.com");
+insert into authors (author_id, author_name) values (1, "Stocker B."), (2, "Darvin C."), (3, "Djordan R.");
+insert into genres (genre_id, genre_name) values (1, "Roman"), (2, "Biology"), (3, "Fantasy");
+INSERT INTO books (title, publication_year, author_id, genre_id) VALUES ('Dracula', 1901, 1, 1), ('On the Origin of Species', 1901, 2, 2), ('The Wheel of Time', 1990, 3, 3);
+INSERT INTO borrowed_books (borrow_id, book_id, user_id, borrow_date, return_date) VALUES (1, 1, 1, '2023-09-28', '2025-09-28'), (2, 2, 2, '2023-09-21', '2025-09-21'), (3, 3, 3, '2023-09-08', '2025-09-03');
+
+
+### TASK3
+connection flow
+1 orders (id, customer_id,employee_id, data, shipper_id) 
+2 order_details (id, order_id, product_id, quantity) 
+3 customers (id, name, contact, address,city, postal_code,county)
+4 employees (id, last_name, firs_name, birthdate, photo, notes)
+5 shippers (id, name , phone)
+6 products (id, name , supplier_id, category_id, unit, price)
+7 suppliers (id, name, contact, address, city, postal_code, county, phone )
+8 categories (id  name, description)
+
+select 
+orders.id, orders.customer_id, orders.employee_id, orders.date, orders.shipper_id, order_details.product_id, order_details.quantity, 
+customers.name as customer_name, customers.contact as customers_contact, customers.address as customer_address, customers.city as client_city, customers.postal_code, customers.country as customer_country,
+employees.last_name as employees_last_name, employees.first_name as employees_first_name, employees.birthdate as employees_birthdate, employees.photo as employees_photo , employees.notes as employees_notes,
+shippers.name as shippers_name, shippers.phone as shippers_phone, 
+products.name as product_name, products.supplier_id, products.category_id, products.unit, products.price,
+suppliers.name as suppliers_name, suppliers.contact as suppliers_contact, suppliers.address as suppliers_address, suppliers.city as suppliers_city, suppliers.postal_code as suppliers_postal_code, suppliers.country as suppliers_county, suppliers.phone as suppliers_phone,
+categories.name as categories_name, categories.description as categories_description
+FROM 
+orders 
+inner join order_details on orders.id = order_details.order_id
+inner join customers on orders.customer_id = customers.id
+inner join employees on orders.employee_id = employees.employee_id
+inner join shippers on orders.shipper_id = shippers.id
+inner join products on order_details.product_id=products.id
+inner join suppliers on products.supplier_id=suppliers.id
+inner join categories on products.category_id=categories.id;
+
+### TASK 4.1 - 518 rows
+select count(*)
+FROM 
+orders 
+inner join order_details on orders.id = order_details.order_id
+inner join customers on orders.customer_id = customers.id
+inner join employees on orders.employee_id = employees.employee_id
+inner join shippers on orders.shipper_id = shippers.id
+inner join products on order_details.product_id=products.id
+inner join suppliers on products.supplier_id=suppliers.id
+inner join categories on products.category_id=categories.id;
+
+### TASK 4.2 
+all left join - rows 518 - збільшується з 196 до 518, в совному бо в азмовленні може зберігатись декілька продуктів.
+
+### task 4.3
+use mydb;
+ 
+select count(*)
+FROM 
+orders 
+inner join  order_details on orders.id = order_details.order_id
+inner join customers on orders.customer_id = customers.id
+inner join employees on orders.employee_id = employees.employee_id
+inner join shippers on orders.shipper_id = shippers.id
+inner join products on order_details.product_id=products.id
+inner join suppliers on products.supplier_id=suppliers.id
+inner join categories on products.category_id=categories.id
+where orders.employee_id> 3 and orders.employee_id<= 10;
+
+
+###TASK 4.4
+use mydb;
+ 
+select count(*),avg(order_details.quantity)
+FROM 
+orders 
+inner join  order_details on orders.id = order_details.order_id
+inner join customers on orders.customer_id = customers.id
+inner join employees on orders.employee_id = employees.employee_id
+inner join shippers on orders.shipper_id = shippers.id
+inner join products on order_details.product_id=products.id
+inner join suppliers on products.supplier_id=suppliers.id
+inner join categories on products.category_id=categories.id
+group by categories.name;
+
+
+### TASK 4.5 
+use mydb;
+ 
+select count(*),avg(order_details.quantity) as quantity
+FROM 
+orders 
+inner join  order_details on orders.id = order_details.order_id
+inner join customers on orders.customer_id = customers.id
+inner join employees on orders.employee_id = employees.employee_id
+inner join shippers on orders.shipper_id = shippers.id
+inner join products on order_details.product_id=products.id
+inner join suppliers on products.supplier_id=suppliers.id
+inner join categories on products.category_id=categories.id
+group by categories.name
+having quantity > 21;
+
+###TASK 4.6
+use mydb;
+ 
+select count(*),avg(order_details.quantity) as quantity
+FROM 
+orders 
+inner join  order_details on orders.id = order_details.order_id
+inner join customers on orders.customer_id = customers.id
+inner join employees on orders.employee_id = employees.employee_id
+inner join shippers on orders.shipper_id = shippers.id
+inner join products on order_details.product_id=products.id
+inner join suppliers on products.supplier_id=suppliers.id
+inner join categories on products.category_id=categories.id
+group by categories.name
+having quantity > 21
+order by quantity desc;
+
+
+### TASK 4.7 
+use mydb;
+ 
+select count(*),avg(order_details.quantity) as quantity
+FROM 
+orders 
+inner join  order_details on orders.id = order_details.order_id
+inner join customers on orders.customer_id = customers.id
+inner join employees on orders.employee_id = employees.employee_id
+inner join shippers on orders.shipper_id = shippers.id
+inner join products on order_details.product_id=products.id
+inner join suppliers on products.supplier_id=suppliers.id
+inner join categories on products.category_id=categories.id
+group by categories.name
+having quantity > 21
+order by quantity desc
+limit 4 offset 1;
